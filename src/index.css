@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Custom color utilities for vibrant gradients and accents */
+.bg-gradient-glow {
+	background: linear-gradient(120deg, #43cea2 0%, #185a9d 100%);
+	opacity: 0.15;
+}
+.bg-gradient-purple {
+	background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
+}
+.bg-gradient-card {
+	background: linear-gradient(135deg, #bfe9ff 0%, #43cea2 100%);
+}
+.bg-solana-purple {
+	background-color: #8e2de2;
+}
+.bg-solana-blue {
+	background-color: #185a9d;
+}
+.bg-solana-green {
+	background-color: #43cea2;
+}
+.bg-solana-pink {
+	background-color: #ff6e7f;
+}
+.text-gradient {
+	background: linear-gradient(90deg, #43cea2, #185a9d, #8e2de2);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	color: transparent;
+}
+.border-gradient {
+	border: 2px solid;
+	border-image: linear-gradient(90deg, #43cea2, #185a9d, #8e2de2) 1;
+}
+.shadow-glow {
+	box-shadow: 0 0 32px 0 #43cea255;
+}
