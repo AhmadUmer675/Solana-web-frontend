@@ -4,20 +4,19 @@ import { Play } from 'lucide-react';
 const videos = [
   {
     title: 'Solana Stories: Behind the Mash ft. PropXAI',
-    thumbnail: 'gradient-1',
     duration: '12:34',
   },
   {
     title: 'Interest Capital Markets: EXPL AI',
-    thumbnail: 'gradient-2',
     duration: '8:45',
   },
 ];
 
 export default function HowWeBuilt() {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-24 bg-black text-white">
       <div className="container mx-auto px-4">
+        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -25,14 +24,15 @@ export default function HowWeBuilt() {
           viewport={{ once: true }}
           className="mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
             How we built this
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-gray-400">
             Hear from the builders behind the biggest projects on Solana.
           </p>
         </motion.div>
 
+        {/* Videos */}
         <div className="grid md:grid-cols-2 gap-6">
           {videos.map((video, index) => (
             <motion.div
@@ -43,25 +43,32 @@ export default function HowWeBuilt() {
               viewport={{ once: true }}
               className="group cursor-pointer"
             >
-              <div className={`relative rounded-2xl overflow-hidden aspect-video ${
-                index === 0 
-                  ? 'bg-gradient-to-br from-solana-purple via-solana-blue to-solana-green'
-                  : 'bg-gradient-to-br from-solana-pink via-solana-purple to-solana-blue'
-              }`}>
-                {/* Play button overlay */}
+              {/* Thumbnail */}
+              <div
+                className={`relative rounded-2xl overflow-hidden aspect-video ${
+                  index === 0
+                    ? 'bg-gradient-to-br from-purple-600 via-cyan-500 to-emerald-400'
+                    : 'bg-gradient-to-br from-pink-600 via-purple-600 to-cyan-500'
+                }`}
+              >
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black/40" />
+
+                {/* Play Button */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-elevated">
-                    <Play className="w-6 h-6 text-foreground ml-1" fill="currentColor" />
+                  <div className="w-16 h-16 rounded-full bg-black/80 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
                   </div>
                 </div>
-                
-                {/* Duration badge */}
-                <div className="absolute bottom-4 right-4 px-2 py-1 bg-background/80 rounded text-sm text-foreground backdrop-blur-sm">
+
+                {/* Duration */}
+                <div className="absolute bottom-4 right-4 px-2 py-1 bg-black/70 rounded text-sm text-white backdrop-blur-sm">
                   {video.duration}
                 </div>
               </div>
-              
-              <h3 className="text-lg font-semibold text-foreground mt-4 group-hover:text-primary transition-colors">
+
+              {/* Title */}
+              <h3 className="text-lg font-semibold mt-4 group-hover:text-cyan-400 transition-colors">
                 {video.title}
               </h3>
             </motion.div>

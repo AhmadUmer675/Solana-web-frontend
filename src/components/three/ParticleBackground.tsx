@@ -1,107 +1,124 @@
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-import * as THREE from 'three';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import ParticleBackground from '@/components/three/ParticleBackground';
 
-function ParticleField() {
-  const ref = useRef<THREE.Points>(null);
-  
-  const particleCount = 2000;
-  
-  const positions = useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
-    }
-    return positions;
-  }, []);
+const partners = ['Circlepay', 'VISA', 'Mastercard', 'Stripe', 'PayPal', 'Lam'];
 
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.x = state.clock.elapsedTime * 0.02;
-      ref.current.rotation.y = state.clock.elapsedTime * 0.03;
-    }
-  });
-
+export default function Hero() {
   return (
-    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-      <PointMaterial
-        transparent
-        color="#9945FF"
-        size={0.03}
-        sizeAttenuation={true}
-        depthWrite={false}
-        opacity={0.8}
-      />
-    </Points>
-  );
-}
-
-function WaveField() {
-  const ref = useRef<THREE.Points>(null);
-  
-  const { positions, originalPositions } = useMemo(() => {
-    const count = 100;
-    const positions = new Float32Array(count * count * 3);
-    const originalPositions = new Float32Array(count * count * 3);
-    
-    for (let i = 0; i < count; i++) {
-      for (let j = 0; j < count; j++) {
-        const index = (i * count + j) * 3;
-        positions[index] = (i - count / 2) * 0.15;
-        positions[index + 1] = 0;
-        positions[index + 2] = (j - count / 2) * 0.15 - 5;
-        
-        originalPositions[index] = positions[index];
-        originalPositions[index + 1] = positions[index + 1];
-        originalPositions[index + 2] = positions[index + 2];
-      }
-    }
-    return { positions, originalPositions };
-  }, []);
-
-  useFrame((state) => {
-    if (ref.current) {
-      const positionAttribute = ref.current.geometry.attributes.position;
-      const time = state.clock.elapsedTime;
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-black text-white">
       
-      for (let i = 0; i < positionAttribute.count; i++) {
-        const x = originalPositions[i * 3];
-        const z = originalPositions[i * 3 + 2];
-        
-        positionAttribute.setY(
-          i,
-          Math.sin(x * 0.5 + time) * 0.3 + Math.sin(z * 0.5 + time * 0.8) * 0.3
-        );
-      }
-      positionAttribute.needsUpdate = true;
-    }
-  });
+      {/* Particle Background */}
+      <ParticleBackground />
 
-  return (
-    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-      <PointMaterial
-        transparent
-        color="#14F195"
-        size={0.02}
-        sizeAttenuation={true}
-        depthWrite={false}
-        opacity={0.6}
-      />
-    </Points>
-  );
-}
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue/60 via-blue/30 to-blue/80 pointer-events-none" />
 
-export default function ParticleBackground() {
-  return (
-    <div className="absolute inset-0 z-0">
-      <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
-        <ambientLight intensity={0.5} />
-        <ParticleField />
-        <WaveField />
-      </Canvas>
-    </div>
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-4 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="text-5xl md:text-7xl font-bold leading-tight mb-6"
+          >
+            <span className="text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-violet-500 to-cyan-400">
+              The capital market
+            </span>
+            <br />
+            <span className="text-white/90">for every asset on earth.</span>
+          </motion.h1>
+
+          {/* Subtext */}
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10"
+          >
+            Solana is the only chain that redefines what's possible — 
+            growing the most liquid markets, the most web3 apps, and free markets, unified.
+          </motion.p>
+
+          {/* Buttons */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.2 } }
+            }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <Button size="lg" className="bg-gradient-to-r from-purple-500 via-violet-500 to-cyan-400 text-black px-8 shadow-lg hover:opacity-90 transition">
+                Start Building <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+            >
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 transition">
+                Read Docs
+              </Button>
+            </motion.div>
+          </motion.div>
+
+          {/* Event Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="border border-white/20 rounded-2xl p-1 max-w-md mx-auto mb-16"
+          >
+            <div className="bg-black/80 rounded-xl p-4 flex items-center gap-4 border border-white/10">
+              <div className="w-16 h-20 bg-gradient-to-r from-purple-500 via-violet-500 to-cyan-400 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-xs font-bold text-black">BREAK</div>
+                  <div className="text-xl font-black text-black">26</div>
+                </div>
+              </div>
+              <div className="text-left">
+                <div className="text-sm text-white/70">Breakpoint 2026</div>
+                <div className="text-white font-medium">Abu Dhabi</div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Partner Logos */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.15 } }
+            }}
+            className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-70"
+          >
+            {partners.map((partner) => (
+              <motion.div
+                key={partner}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-blue font-semibold text-lg"
+              >
+                {partner}
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
   );
 }

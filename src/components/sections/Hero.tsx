@@ -1,96 +1,243 @@
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import ParticleBackground from '@/components/three/ParticleBackground';
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 
-const partners = [
-  'Circlepay', 'VISA', 'Mastercard', 'Stripe', 'PayPal', 'Lam'
-];
+const WaveBackground = () => {
+  const mountRef = useRef(null);
+  
+  useEffect(() => {
+    if (!mountRef.current) return;
+    
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+    mountRef.current.appendChild(renderer.domElement);
+    
+    // Create animated wave mesh
+    const geometry = new THREE.PlaneGeometry(100, 100, 50, 50);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x9945FF,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.3
+    });
+    
+    const wave = new THREE.Mesh(geometry, material);
+    wave.rotation.x = -Math.PI / 3;
+    scene.add(wave);
+    
+    // Add flowing particles
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 2000;
+    const posArray = new Float32Array(particlesCount * 3);
+    
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 150;
+    }
+    
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.2,
+      color: 0x14F195,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particles);
+    
+    camera.position.z = 50;
+    camera.position.y = 20;
+    
+    let time = 0;
+    
+    const animate = () => {
+      requestAnimationFrame(animate);
+      time += 0.01;
+      
+      // Animate wave vertices
+      const positions = wave.geometry.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = Math.sin(x * 0.2 + time) * Math.cos(y * 0.2 + time) * 3;
+        positions.setZ(i, z);
+      }
+      positions.needsUpdate = true;
+      
+      particles.rotation.y += 0.0005;
+      
+      renderer.render(scene, camera);
+    };
+    
+    animate();
+    
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+    };
+  }, []);
+  
+  return <div ref={mountRef} className="absolute top-0 left-0 w-full h-full" />;
+};
 
-export default function Hero() {
+// ==================== Hero Components with Animations ====================
+
+const HeroContent = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      <ParticleBackground />
-      
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-glow pointer-events-none" />
-      
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-7xl font-bold leading-tight mb-6"
-          >
-            <span className="text-foreground">The capital market</span>
-            <br />
-            <span className="text-gradient">for every asset on earth.</span>
-          </motion.h1>
+    <div className="max-w-4xl animate-fadeInUp mt-24" style={{ animationDelay: '0.2s' }}>
+      <h1 className="text-7xl md:text-8xl font-bold text-white mb-6 leading-none mt-8">
+        <span className="inline-block animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+          The capital market
+        </span>
+        <br />
+        <span className="inline-block animate-fadeInUp bg-gradient-to-r from-purple-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent" style={{ animationDelay: '0.5s' }}>
+          for every asset on earth.
+        </span>
+      </h1>
+      <p className="text-xl text-gray-400 mb-8 max-w-2xl animate-fadeInUp" style={{ animationDelay: '0.7s' }}>
+        Solana is the leading high performance network powering internet capital markets, payments, and crypto applications.
+      </p>
+      <div className="flex space-x-4 animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
+        <button className="bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-gray-100 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+          Get Started →
+        </button>
+        <button className="border border-white/20 text-white px-8 py-4 rounded-full hover:border-white/40 transition-all duration-300 hover:scale-105 hover:bg-white/5">
+          Read Docs
+        </button>
+      </div>
+    </div>
+  );
+};
 
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8"
-          >
-            Solana is the only chain that redefines what's
-            possible. Growing, the most liquid markets,
-            the most web3 apps, and free markets, unify.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
-          >
-            <Button size="lg" className="bg-gradient-purple text-primary-foreground hover:opacity-90 px-8 shadow-glow">
-              Start Building
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-secondary">
-              Read Docs
-            </Button>
-          </motion.div>
-
-          {/* Event Card Preview */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="border-gradient rounded-2xl p-1 max-w-md mx-auto mb-16"
-          >
-            <div className="bg-gradient-card rounded-xl p-4 flex items-center gap-4">
-              <div className="w-16 h-20 bg-gradient-purple rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-xs font-bold text-primary-foreground">BREAK</div>
-                  <div className="text-xl font-black text-primary-foreground">26</div>
-                </div>
-              </div>
-              <div className="text-left">
-                <div className="text-sm text-muted-foreground">Breakpoint 2026</div>
-                <div className="text-foreground font-medium">Abu Dhabi</div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Partner Logos */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-60"
-        >
-          {partners.map((partner) => (
-            <div key={partner} className="text-muted-foreground font-semibold text-lg">
+const PartnerLogos = () => {
+  const partners = ['Phantom', 'VISA', 'Worldpay', 'Circle', 'Stripe', 'Jump'];
+  
+  return (
+    <div className="absolute bottom-12 left-0 right-0 z-10 animate-fadeIn" style={{ animationDelay: '1.3s' }}>
+      <div className="container mx-auto px-6">
+        <div className="flex items-center justify-center space-x-12 opacity-40">
+          {partners.map((partner, i) => (
+            <div 
+              key={i} 
+              className="text-white text-sm hover:opacity-100 transition-all duration-300 hover:scale-110 animate-fadeInUp"
+              style={{ animationDelay: `${1.4 + i * 0.1}s` }}
+            >
               {partner}
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </section>
+    </div>
+  );
+};
+
+const Hero = () => {
+  return (
+    <div className="relative min-h-screen bg-black overflow-hidden flex items-center">
+      <WaveBackground />
+      <div className="relative z-10 container mx-auto px-6">
+        <HeroContent />
+      </div>
+      <PartnerLogos />
+    </div>
+  );
+};
+
+export default function App() {
+  return (
+    <div className="bg-black">
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+          from { 
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to { 
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 1s ease-out forwards;
+          opacity: 0;
+        }
+        
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease-out forwards;
+          opacity: 0;
+        }
+        
+        .animate-slideInLeft {
+          animation: slideInLeft 0.8s ease-out forwards;
+          opacity: 0;
+        }
+        
+        .animate-slideInRight {
+          animation: slideInRight 0.8s ease-out forwards;
+          opacity: 0;
+        }
+        
+        .animate-scaleIn {
+          animation: scaleIn 0.8s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
+      
+      <Hero />
+    </div>
   );
 }
