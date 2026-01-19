@@ -17,18 +17,18 @@ const socialLinks = [
 
 export default function Community() {
   return (
-    <section className="py-24 bg-black text-white relative overflow-hidden">
-      {/* Soft glow background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/10 to-black" />
+    <section className="relative py-24 text-white overflow-hidden">
+      {/* Base black */}
+      <div className="absolute inset-0 bg-black" />
+
+      {/* Gradient blur background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-purple-600/20 to-emerald-500/20 blur-3xl" />
 
       {/* Glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-purple-600/20 rounded-full blur-[140px] animate-pulse" />
-      <div
-        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-emerald-500/20 rounded-full blur-[120px] animate-pulse"
-        style={{ animationDelay: '2s' }}
-      />
+      <div className="absolute top-1/3 left-1/4 w-[420px] h-[420px] bg-cyan-500/25 rounded-full blur-[160px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-[360px] h-[360px] bg-purple-600/25 rounded-full blur-[150px]" />
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="relative container mx-auto px-4 z-10">
         {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -39,7 +39,7 @@ export default function Community() {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Build alongside <br />
-            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
               our global community.
             </span>
           </h2>
@@ -58,7 +58,7 @@ export default function Community() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="rounded-xl p-6 bg-white/5 border border-white/10 text-center hover:border-purple-500/40 transition-all group"
+              className="rounded-2xl p-6 bg-white/5 backdrop-blur-md border border-white/10 text-center hover:border-cyan-400/40 transition-all group"
             >
               <stat.icon className="w-8 h-8 text-cyan-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
               <div className="text-3xl font-bold mb-1">{stat.value}</div>
@@ -78,10 +78,10 @@ export default function Community() {
           {socialLinks.map((link, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition-all cursor-pointer group"
+              className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-purple-400/40 transition-all cursor-pointer group"
             >
-              <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                <span className="text-cyan-400 font-bold">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-cyan-500/30 to-purple-500/30 flex items-center justify-center">
+                <span className="text-cyan-400 font-bold text-lg">
                   {link.name[0]}
                 </span>
               </div>

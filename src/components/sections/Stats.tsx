@@ -17,9 +17,9 @@ export default function Stats() {
   return (
     <section className="relative py-24 bg-black text-white overflow-hidden">
 
-      {/* Subtle Purple Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-        w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[140px]" />
+      {/* Gradient + Blur Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+        w-[600px] h-[600px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 opacity-10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
 
@@ -53,9 +53,9 @@ export default function Stats() {
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className="rounded-xl p-[1px] bg-gradient-to-r from-purple-500 to-cyan-500"
+                className="rounded-xl p-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400"
               >
-                <div className="bg-black rounded-xl p-6">
+                <div className="bg-black/80 rounded-xl p-6 backdrop-blur-sm">
                   <div className="flex items-center gap-2 text-emerald-400 mb-2">
                     <TrendingUp className="w-4 h-4" />
                     <span className="text-sm">Real-time data</span>

@@ -14,8 +14,12 @@ const videos = [
 
 export default function HowWeBuilt() {
   return (
-    <section className="py-24 bg-black text-white">
-      <div className="container mx-auto px-4">
+    <section className="relative py-24 text-white overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-black" />
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-purple-600/20 to-emerald-500/20 blur-3xl" />
+
+      <div className="relative container mx-auto px-4">
         {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -44,25 +48,19 @@ export default function HowWeBuilt() {
               className="group cursor-pointer"
             >
               {/* Thumbnail */}
-              <div
-                className={`relative rounded-2xl overflow-hidden aspect-video ${
-                  index === 0
-                    ? 'bg-gradient-to-br from-purple-600 via-cyan-500 to-emerald-400'
-                    : 'bg-gradient-to-br from-pink-600 via-purple-600 to-cyan-500'
-                }`}
-              >
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/40" />
+              <div className="relative rounded-2xl overflow-hidden aspect-video bg-gradient-to-br from-cyan-500 via-purple-600 to-emerald-500">
+                {/* Glass overlay */}
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-md" />
 
                 {/* Play Button */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-black/80 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
                   </div>
                 </div>
 
                 {/* Duration */}
-                <div className="absolute bottom-4 right-4 px-2 py-1 bg-black/70 rounded text-sm text-white backdrop-blur-sm">
+                <div className="absolute bottom-4 right-4 px-2 py-1 bg-black/60 backdrop-blur rounded text-sm">
                   {video.duration}
                 </div>
               </div>

@@ -17,8 +17,13 @@ const moreInstitutions = [
 
 export default function Institutions() {
   return (
-    <section className="py-24 bg-black text-white">
-      <div className="container mx-auto px-4">
+    <section className="relative py-24 bg-black text-white overflow-hidden">
+      
+      {/* Gradient + Blur Background */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+        w-[700px] h-[700px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 opacity-10 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="container mx-auto px-4 relative z-10">
 
         {/* Heading */}
         <motion.div
@@ -26,14 +31,14 @@ export default function Institutions() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mb-16"
+          className="mb-16 text-center md:text-left"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             The world&apos;s largest institutions
             <br />
             and fintechs are building on
             <br />
-            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
               Solana.
             </span>
           </h2>
@@ -45,7 +50,7 @@ export default function Institutions() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="flex flex-wrap gap-8 items-center mb-16 text-white/60"
+          className="flex flex-wrap gap-8 items-center mb-16 text-white/70 justify-center md:justify-start"
         >
           {logos.map((logo) => (
             <div key={logo} className="font-semibold text-xl tracking-wide">
@@ -63,9 +68,9 @@ export default function Institutions() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="rounded-xl p-[1px] bg-gradient-to-r from-purple-500 to-cyan-500"
+              className="rounded-xl p-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400"
             >
-              <div className="rounded-xl p-6 bg-black">
+              <div className="rounded-xl p-6 bg-black/80 backdrop-blur-sm">
                 <div className="text-2xl font-bold text-white mb-1">
                   {item.stat}
                 </div>
@@ -88,8 +93,8 @@ export default function Institutions() {
               viewport={{ once: true }}
               className="flex items-center gap-4"
             >
-              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 flex items-center justify-center">
+                <span className="text-black font-bold text-lg">
                   {item.name[0]}
                 </span>
               </div>

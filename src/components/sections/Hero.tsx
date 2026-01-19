@@ -1,5 +1,9 @@
-import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { X } from "lucide-react";
+import Logo from "./../../../public/images.png";
+
+/* ===================== WAVE BACKGROUND ===================== */
 
 const WaveBackground: React.FC = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -7,7 +11,7 @@ const WaveBackground: React.FC = () => {
   useEffect(() => {
     if (!mountRef.current) return;
 
-    const mountElement: HTMLDivElement = mountRef.current;
+    const mountElement = mountRef.current;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -17,18 +21,13 @@ const WaveBackground: React.FC = () => {
       1000
     );
 
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-    });
-
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
 
-    const canvas: HTMLCanvasElement = renderer.domElement;
-    mountElement.appendChild(canvas);
+    mountElement.appendChild(renderer.domElement);
 
-    // ===== Wave Mesh =====
+    // Wave
     const geometry = new THREE.PlaneGeometry(100, 100, 50, 50);
     const material = new THREE.MeshBasicMaterial({
       color: 0x9945ff,
@@ -41,17 +40,17 @@ const WaveBackground: React.FC = () => {
     wave.rotation.x = -Math.PI / 3;
     scene.add(wave);
 
-    // ===== Particles =====
+    // Particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 2000;
-    const posArray = new Float32Array(particlesCount * 3);
+    const count = 2000;
+    const posArray = new Float32Array(count * 3);
 
-    for (let i = 0; i < particlesCount * 3; i++) {
+    for (let i = 0; i < count * 3; i++) {
       posArray[i] = (Math.random() - 0.5) * 150;
     }
 
     particlesGeometry.setAttribute(
-      'position',
+      "position",
       new THREE.BufferAttribute(posArray, 3)
     );
 
@@ -75,7 +74,6 @@ const WaveBackground: React.FC = () => {
 
     const animate = () => {
       time += 0.01;
-
       const positions =
         wave.geometry.attributes.position as THREE.BufferAttribute;
 
@@ -86,7 +84,6 @@ const WaveBackground: React.FC = () => {
           Math.sin(x * 0.2 + time) *
           Math.cos(y * 0.2 + time) *
           3;
-
         positions.setZ(i, z);
       }
 
@@ -99,22 +96,17 @@ const WaveBackground: React.FC = () => {
 
     animate();
 
-    const handleResize = () => {
+    const resize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", resize);
 
-    // ===== Cleanup =====
     return () => {
-      window.removeEventListener('resize', handleResize);
-
-      if (mountElement.contains(canvas)) {
-        mountElement.removeChild(canvas);
-      }
-
+      window.removeEventListener("resize", resize);
+      mountElement.removeChild(renderer.domElement);
       geometry.dispose();
       material.dispose();
       particlesGeometry.dispose();
@@ -131,41 +123,97 @@ const WaveBackground: React.FC = () => {
   );
 };
 
-// ==================== HERO ====================
+/* ===================== WALLET MODAL ===================== */
 
-const HeroContent: React.FC = () => (
-  <div className="max-w-4xl animate-fadeInUp mt-24">
-    <h1 className="text-7xl md:text-8xl font-bold text-white mb-6 leading-none">
-      The capital market
-      <br />
-      <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
-        for every asset on earth.
-      </span>
-    </h1>
+const WalletModal = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-    <p className="text-xl text-gray-400 mb-8 max-w-2xl">
-      Solana is the leading high performance network powering internet
-      capital markets, payments, and crypto applications.
-    </p>
+      <div className="relative bg-[#0b0f1a] border border-white/10 rounded-2xl p-8 w-[360px] z-10">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white/60 hover:text-white"
+        >
+          <X className="h-5 w-5" />
+        </button>
 
-    <div className="flex space-x-4">
-      <button className="bg-white text-black px-8 py-4 rounded-full">
-        Get Started →
-      </button>
-      <button className="border border-white/20 text-white px-8 py-4 rounded-full">
-        Read Docs
-      </button>
+        <h2 className="text-xl font-semibold text-white text-center mb-6">
+          Connect a wallet on
+          <br />
+          Solana to continue
+        </h2>
+
+        <button className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 transition rounded-xl px-4 py-3 border border-white/10">
+          <div className="flex items-center gap-3">
+            <img
+              src={Logo}
+              alt="Phantom"
+              className="h-6 w-6"
+            />
+            <span className="text-white font-medium">Phantom</span>
+          </div>
+          <span className="text-sm text-white/50">Detected</span>
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-const Hero: React.FC = () => (
-  <div className="relative min-h-screen bg-black overflow-hidden flex items-center">
-    <WaveBackground />
-    <div className="relative z-10 container mx-auto px-6">
-      <HeroContent />
+/* ===================== HERO CONTENT ===================== */
+
+const HeroContent: React.FC = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <div className="max-w-4xl mt-24">
+        <h1 className="text-7xl md:text-8xl font-bold text-white mb-6 leading-none">
+          The capital market
+          <br />
+          <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            for every asset on earth.
+          </span>
+        </h1>
+
+        <p className="text-xl text-gray-400 mb-8 max-w-2xl">
+          Solana is the leading high performance network powering internet
+          capital markets, payments, and crypto applications.
+        </p>
+
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setOpen(true)}
+            className="bg-white text-black px-8 py-4 rounded-full hover:scale-105 transition"
+          >
+            Connect Wallet To Start →
+          </button>
+
+          <button className="border border-white/20 text-white px-8 py-4 rounded-full">
+            Learn More
+          </button>
+        </div>
+      </div>
+
+      {open && <WalletModal onClose={() => setOpen(false)} />}
+    </>
+  );
+};
+
+/* ===================== HERO ===================== */
+
+const Hero: React.FC = () => {
+  return (
+    <div className="relative min-h-screen bg-black overflow-hidden flex items-center">
+      <WaveBackground />
+      <div className="relative z-10 container mx-auto px-6">
+        <HeroContent />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Hero;

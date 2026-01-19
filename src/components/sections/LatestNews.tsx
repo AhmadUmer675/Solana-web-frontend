@@ -16,7 +16,8 @@ export default function LatestNews() {
   return (
     <section className="py-24 bg-black relative overflow-hidden text-white">
       {/* Background glow */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[150px]" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-tr from-purple-600/30 to-cyan-400/30 rounded-full blur-[150px]" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-bl from-purple-600/20 to-cyan-400/20 rounded-full blur-[150px]" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Heading */}
@@ -28,7 +29,7 @@ export default function LatestNews() {
           className="mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold">
-            the latest on{' '}
+            The latest on{' '}
             <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
               Solana
             </span>
@@ -48,7 +49,7 @@ export default function LatestNews() {
               {statsCards.map((stat, index) => (
                 <div
                   key={index}
-                  className="bg-zinc-800 rounded-xl p-4"
+                  className="bg-zinc-800 rounded-xl p-4 border border-zinc-700"
                 >
                   <div className="text-gray-400 text-sm mb-1">
                     {stat.label}
@@ -64,15 +65,11 @@ export default function LatestNews() {
               {comparisonData.map((row, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/70"
+                  className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/70 border border-zinc-700"
                 >
                   <span className="text-gray-400">{row.network}</span>
-                  <span className="font-medium text-white">
-                    {row.tps}
-                  </span>
-                  <span className="text-gray-400 text-sm">
-                    {row.time}
-                  </span>
+                  <span className="font-medium text-white">{row.tps}</span>
+                  <span className="text-gray-400 text-sm">{row.time}</span>
                 </div>
               ))}
             </div>
