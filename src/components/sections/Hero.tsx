@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { X } from "lucide-react";
 import Logo from "./../../../public/images.png";
+import { useWallet } from "@/context/WalletContext";
 
 /* ===================== WAVE BACKGROUND ===================== */
 
@@ -123,50 +124,10 @@ const WaveBackground: React.FC = () => {
   );
 };
 
-/* ===================== WALLET MODAL ===================== */
-
-const WalletModal = ({ onClose }: { onClose: () => void }) => {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      <div className="relative bg-[#0b0f1a] border border-white/10 rounded-2xl p-8 w-[360px] z-10">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-white/60 hover:text-white"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
-        <h2 className="text-xl font-semibold text-white text-center mb-6">
-          Connect a wallet on
-          <br />
-          Solana to continue
-        </h2>
-
-        <button className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 transition rounded-xl px-4 py-3 border border-white/10">
-          <div className="flex items-center gap-3">
-            <img
-              src={Logo}
-              alt="Phantom"
-              className="h-6 w-6"
-            />
-            <span className="text-white font-medium">Phantom</span>
-          </div>
-          <span className="text-sm text-white/50">Detected</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-
 /* ===================== HERO CONTENT ===================== */
 
 const HeroContent: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const { walletConnected, walletAddress, setShowWalletModal } = useWallet();
 
   return (
     <>
@@ -186,10 +147,17 @@ const HeroContent: React.FC = () => {
 
         <div className="flex space-x-4">
           <button
-            onClick={() => setOpen(true)}
-            className="bg-white text-black px-8 py-4 rounded-full hover:scale-105 transition"
+            onClick={() => setShowWalletModal(true)}
+            className="bg-white text-black px-8 py-4 rounded-full hover:scale-105 transition flex items-center gap-2"
           >
-            Connect Wallet To Start →
+            {walletConnected && walletAddress ? (
+              <>
+                <span>Connected:</span>
+                <span className="font-mono">{walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}</span>
+              </>
+            ) : (
+              "Connect Wallet To Start →"
+            )}
           </button>
 
           <button className="border border-white/20 text-white px-8 py-4 rounded-full">
@@ -197,8 +165,6 @@ const HeroContent: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {open && <WalletModal onClose={() => setOpen(false)} />}
     </>
   );
 };
