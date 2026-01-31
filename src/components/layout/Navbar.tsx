@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Wallet, Copy, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import Logo from "./../../../public/images.png";
 import { useWallet } from "@/context/WalletContext";
-import { getPhantomStatus } from "@/lib/wallet";
+import { getPhantomStatus, isIOSDevice } from "@/lib/wallet";
 
 const navLinks = [
   { name: "Create Token", path: "/create-token" },
@@ -305,7 +305,7 @@ export default function Navbar() {
                     </p>
                     <a
                       href={status.isMobile 
-                        ? (status.isIOS ? 'https://apps.apple.com/app/phantom-solana-wallet/id1598432978' : 'https://play.google.com/store/apps/details?id=app.phantom')
+                        ? (isIOSDevice() ? 'https://apps.apple.com/app/phantom-solana-wallet/id1598432978' : 'https://play.google.com/store/apps/details?id=app.phantom')
                         : 'https://phantom.app'}
                       target="_blank"
                       rel="noopener noreferrer"

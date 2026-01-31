@@ -1,5 +1,5 @@
 import apiRequest from '@/lib/api';
-import { Transaction, Connection, Keypair } from '@solana/web3.js';
+import { Transaction, Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 
 // Solana connection
@@ -7,12 +7,6 @@ const SOLANA_RPC_URL =
   import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 
 export const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
-
-declare global {
-  interface Window {
-    solana?: any;
-  }
-}
 
 /* ===================== TYPES ===================== */
 
@@ -105,7 +99,9 @@ export async function signAndSendFeeTransaction(
       await connection.getLatestBlockhash()
     ).blockhash;
 
-    transaction.feePayer = window.solana.publicKey;
+    if (window.solana?.publicKey) {
+      transaction.feePayer = new PublicKey(window.solana.publicKey.toBase58());
+    }
 
     const signedTx = await window.solana.signTransaction(transaction);
     const signature = await connection.sendRawTransaction(
@@ -155,7 +151,9 @@ export async function signAndSendTokenTransaction(
       await connection.getLatestBlockhash()
     ).blockhash;
 
-    transaction.feePayer = window.solana.publicKey;
+    if (window.solana?.publicKey) {
+      transaction.feePayer = new PublicKey(window.solana.publicKey.toBase58());
+    }
 
     const signedTx = await window.solana.signTransaction(transaction);
     signedTx.partialSign(mintKeypair);

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { 
   connectPhantomWallet, 
   disconnectPhantomWallet 
@@ -97,7 +97,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     });
 
     // On mobile, also check periodically for Phantom injection
-    let mobileCheckInterval: NodeJS.Timeout | null = null;
+    let mobileCheckInterval: ReturnType<typeof setInterval> | null = null;
     if (isMobileDevice()) {
       mobileCheckInterval = setInterval(() => {
         const address = getCurrentWalletAddress();

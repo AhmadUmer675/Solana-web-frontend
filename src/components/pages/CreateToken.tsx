@@ -119,10 +119,10 @@ const CreateToken = () => {
     // Here we just keep the supply string as is
   };
 
-  const formatSupply = (supply: string, decimals: number) => {
+  const formatSupply = (supply: string, decimals: number = 0) => {
     const num = parseFloat(supply);
     if (isNaN(num)) return '0';
-    return num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    return num.toLocaleString('en-US', { maximumFractionDigits: decimals });
   };
 
   const calculateTotalCost = () => {
@@ -295,8 +295,7 @@ const CreateToken = () => {
         // Step 2: Sign and send fee transaction
         setSuccess('Please sign the fee transaction in Phantom...');
         const feeSignResult = await signAndSendFeeTransaction(
-          feeResult.serializedTransaction,
-          feeResult.lastValidBlockHeight || 0
+          feeResult.serializedTransaction
         );
 
         if (!feeSignResult.success || !feeSignResult.signature) {

@@ -1,4 +1,4 @@
-import { Check, Link2, Shield } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface StepperProps {
   currentStep: number;
@@ -15,7 +15,6 @@ const Stepper = ({ currentStep, steps }: StepperProps) => {
       {steps.map((step, index) => {
         const isCompleted = currentStep > step.id;
         const isActive = currentStep === step.id;
-        const isUpcoming = currentStep < step.id;
 
         return (
           <div key={step.id} className="flex items-center flex-1">

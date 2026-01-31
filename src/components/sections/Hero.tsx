@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { X } from "lucide-react";
-import Logo from "./../../../public/images.png";
 import { useWallet } from "@/context/WalletContext";
 
 /* ===================== WAVE BACKGROUND ===================== */

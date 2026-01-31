@@ -12,9 +12,7 @@ import {
   isWalletConnected,
   onWalletAccountChange,
   waitForPhantom,
-  isMobileDevice,
   getPhantomStatus,
-  isPhantomMobileAvailable
 } from '@/lib/wallet';
 
 /* ===============================
@@ -26,6 +24,7 @@ export interface ConnectWalletResponse {
   wallet?: string;
   message?: string;
   error?: string;
+  isMobile?: boolean;
 }
 
 export interface WalletState {
@@ -138,12 +137,14 @@ export async function connectPhantomWallet(): Promise<ConnectWalletResponse> {
         return {
           success: false,
           error: phantomResult.error || 'Please approve the connection in Phantom app',
+          isMobile: true,
         };
       }
       
       return {
         success: false,
         error: phantomResult.error || 'Failed to connect to Phantom wallet',
+        isMobile: phantomResult.isMobile,
       };
     }
 
@@ -161,6 +162,7 @@ export async function connectPhantomWallet(): Promise<ConnectWalletResponse> {
       success: true,
       wallet: phantomResult.publicKey,
       message: backendResult.message || 'Wallet connected successfully',
+      isMobile: phantomResult.isMobile,
     };
   } catch (error) {
     return {
@@ -308,7 +310,7 @@ export async function verifyWalletSignature(
 /**
  * Request wallet to sign a message
  */
-export async function signMessage(message: string): Promise<{
+export async function signMessage(_message: string): Promise<{
   success: boolean;
   signature?: string;
   error?: string;
