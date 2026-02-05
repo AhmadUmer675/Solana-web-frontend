@@ -126,9 +126,10 @@ export default function Navbar() {
                           Copy address
                         </button>
                         <button
-                          onClick={() => {
-                            disconnect();
+                          onClick={async () => {
+                            await disconnect();
                             setIsDropdownOpen(false);
+                            navigate("/");
                           }}
                           className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors border-t border-white/5"
                         >

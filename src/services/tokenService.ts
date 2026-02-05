@@ -1,5 +1,5 @@
 import apiRequest from '@/lib/api';
-import { Transaction, Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Transaction, Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 
 // Solana connection
@@ -178,4 +178,13 @@ export async function signAndSendTokenTransaction(
 
 export function generateMintKeypair(): Keypair {
   return Keypair.generate();
+}
+
+export async function getWalletBalanceSOL(walletAddress: string) {
+  try {
+    const lamports = await connection.getBalance(new PublicKey(walletAddress));
+    return lamports / LAMPORTS_PER_SOL;
+  } catch {
+    return null;
+  }
 }

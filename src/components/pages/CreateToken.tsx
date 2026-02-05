@@ -29,7 +29,8 @@ import {
   createTokenOnBackend,
   signAndSendTokenTransaction,
   generateMintKeypair,
-  uploadToIPFS
+  uploadToIPFS,
+  getWalletBalanceSOL
 } from '@/services/tokenService';
 import { Keypair } from '@solana/web3.js';
 import { 
@@ -79,6 +80,16 @@ const CreateToken = () => {
   const [feeTxSignature, setFeeTxSignature] = useState<string | null>(null);
   const [mintKeypair, setMintKeypair] = useState<Keypair | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [txProgress, setTxProgress] = useState<
+    { label: string; status: 'pending' | 'active' | 'done' | 'error' }[]
+  >([
+    { label: 'Preparing Transaction', status: 'pending' },
+    { label: 'Confirming', status: 'pending' },
+    { label: 'Processing', status: 'pending' },
+    { label: 'Creating Token', status: 'pending' },
+  ]);
+  const [mintAddress, setMintAddress] = useState<string | null>(null);
   const [formData, setFormData] = useState<TokenFormData>({
     tokenName: '',
     tokenSymbol: '',
@@ -107,7 +118,7 @@ const CreateToken = () => {
     { id: 3, label: 'Details', icon: <Shield className="w-6 h-6" /> },
   ];
 
-  const updateFormData = (field: keyof TokenFormData, value: any) => {
+  const updateFormData = <K extends keyof TokenFormData>(field: K, value: TokenFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -177,16 +188,28 @@ const CreateToken = () => {
         if (address) {
           setWalletAddress(address);
           setWalletStatus('connected');
+          try {
+            const bal = await getWalletBalanceSOL(address);
+            setWalletBalance(bal);
+          } catch {
+            setWalletBalance(null);
+          }
         } else {
           setWalletStatus('installed_disconnected');
           
           // Auto-connect if inside Phantom browser (mobile or desktop)
-          if ((window as any).solana?.isPhantom) {
+          if (window.solana?.isPhantom) {
              try {
-               const resp = await (window as any).solana.connect({ onlyIfTrusted: true });
+               const resp = await window.solana.connect({ onlyIfTrusted: true });
                if (resp.publicKey) {
                  setWalletAddress(resp.publicKey.toString());
                  setWalletStatus('connected');
+                 try {
+                   const bal = await getWalletBalanceSOL(resp.publicKey.toString());
+                   setWalletBalance(bal);
+                 } catch {
+                   setWalletBalance(null);
+                 }
                }
              } catch (e) {
                // Ignore eager connection errors
@@ -206,6 +229,7 @@ const CreateToken = () => {
       if (publicKey) {
         setWalletAddress(publicKey);
         setWalletStatus('connected');
+        getWalletBalanceSOL(publicKey).then(setWalletBalance).catch(() => {});
       } else {
         setWalletAddress(null);
         setWalletStatus(isPhantomInstalled() ? 'installed_disconnected' : 'not_installed');
@@ -227,6 +251,12 @@ const CreateToken = () => {
       if (result.success && result.wallet) {
         setWalletAddress(result.wallet);
         setWalletStatus('connected');
+        try {
+          const bal = await getWalletBalanceSOL(result.wallet);
+          setWalletBalance(bal);
+        } catch {
+          setWalletBalance(null);
+        }
       } else {
         // Only show error if it's not a redirect/mobile handling case
         if (result.error) {
@@ -279,6 +309,32 @@ const CreateToken = () => {
     setIsProcessing(true);
     setError(null);
     setSuccess(null);
+    setMintAddress(null);
+    setTxProgress([
+      { label: 'Preparing Transaction', status: 'active' },
+      { label: 'Confirming', status: 'pending' },
+      { label: 'Processing', status: 'pending' },
+      { label: 'Creating Token', status: 'pending' },
+    ]);
+
+    // Auto-detect SOL amount and block if insufficient
+    try {
+      const bal = await getWalletBalanceSOL(walletAddress);
+      setWalletBalance(bal);
+      if (bal !== null && bal < 0.02) {
+        setError('Insufficient SOL balance (need ~0.02 SOL for rent & fees)');
+        setIsProcessing(false);
+        setTxProgress([
+          { label: 'Preparing Transaction', status: 'error' },
+          { label: 'Confirming', status: 'pending' },
+          { label: 'Processing', status: 'pending' },
+          { label: 'Creating Token', status: 'pending' },
+        ]);
+        return;
+      }
+    } catch {
+      setTxProgress(prev => prev);
+    }
 
     try {
       // Step 1: Get fee transaction if not already paid
@@ -304,6 +360,12 @@ const CreateToken = () => {
 
         signature = feeSignResult.signature;
         setFeeTxSignature(signature);
+        setTxProgress([
+          { label: 'Preparing Transaction', status: 'done' },
+          { label: 'Confirming', status: 'active' },
+          { label: 'Processing', status: 'pending' },
+          { label: 'Creating Token', status: 'pending' },
+        ]);
       }
 
       // Step 3: Generate mint keypair if not already generated
@@ -329,6 +391,12 @@ const CreateToken = () => {
 
       // Step 5: Create token on backend with all metadata
       setSuccess('Creating token metadata...');
+      setTxProgress([
+        { label: 'Preparing Transaction', status: 'done' },
+        { label: 'Confirming', status: 'done' },
+        { label: 'Processing', status: 'active' },
+        { label: 'Creating Token', status: 'pending' },
+      ]);
       const createResult = await createTokenOnBackend(walletAddress, {
         tokenName: formData.tokenName.trim(),
         symbol: formData.tokenSymbol.trim().toUpperCase(),
@@ -361,7 +429,14 @@ const CreateToken = () => {
 
       // Success!
       const mintAddr = tokenSignResult.mintAddress;
-      setSuccess(`Token Created Successfully! Check your Phantom Wallet. Mint: ${mintAddr}`);
+      setMintAddress(mintAddr || null);
+      setSuccess(`Token Created Successfully! Mint: ${mintAddr}`);
+      setTxProgress([
+        { label: 'Preparing Transaction', status: 'done' },
+        { label: 'Confirming', status: 'done' },
+        { label: 'Processing', status: 'done' },
+        { label: 'Creating Token', status: 'done' },
+      ]);
       
       // Reset form after 10 seconds
       setTimeout(() => {
@@ -393,9 +468,15 @@ const CreateToken = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 10000);
 
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Failed to create token');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Failed to create token');
+      setTxProgress(prev => {
+        const next = [...prev];
+        const i = next.findIndex(s => s.status === 'active');
+        if (i >= 0) next[i] = { ...next[i], status: 'error' };
+        return next;
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -551,7 +632,91 @@ const CreateToken = () => {
                </span>
                <span className="text-xs text-gray-500 ml-1">(Receive Address)</span>
              </div>
+             {walletBalance !== null && (
+               <div className="mt-3 text-sm text-gray-400">
+                 Balance: <span className="text-emerald-400 font-mono">{walletBalance.toFixed(4)} SOL</span>
+               </div>
+             )}
           </div>
+
+          {/* Progress Popup */}
+          <AnimatePresence>
+            {(isProcessing || success || error || mintAddress) && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur"
+              >
+                <motion.div
+                  initial={{ scale: 0.95, y: 10, opacity: 0 }}
+                  animate={{ scale: 1, y: 0, opacity: 1 }}
+                  exit={{ scale: 0.95, y: 10, opacity: 0 }}
+                  className="relative w-full max-w-lg rounded-2xl bg-gradient-to-br from-[#0b0f1a] to-[#0f172a] p-6 text-white border border-purple-500/30"
+                >
+                  {/* Close (disabled while processing) */}
+                  <button
+                    onClick={() => { if (!isProcessing) { setSuccess(null); setError(null); setMintAddress(null); } }}
+                    disabled={isProcessing}
+                    className="absolute right-4 top-4 text-white/60 hover:text-white disabled:opacity-40"
+                    title={isProcessing ? 'Processing...' : 'Close'}
+                  >
+                    <X />
+                  </button>
+
+                  <h3 className="text-2xl font-semibold mb-1">Creating Your Token</h3>
+                  <p className="text-sm text-gray-400 mb-4">
+                    We’re setting up your token on the Solana network. This process usually takes about 30 seconds.
+                  </p>
+
+                  <div className="space-y-3">
+                    {txProgress.map((s, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                          s.status === 'done' ? 'bg-emerald-500/20 border border-emerald-400' :
+                          s.status === 'active' ? 'bg-purple-500/20 border border-purple-400 animate-pulse' :
+                          s.status === 'error' ? 'bg-red-500/20 border border-red-400' :
+                          'bg-gray-700 border border-gray-600'
+                        }`}>
+                          {s.status === 'done' ? <Check className="w-3 h-3 text-emerald-400" /> :
+                           s.status === 'error' ? <X className="w-3 h-3 text-red-400" /> :
+                           <div className="w-2 h-2 rounded-full bg-current" />}
+                        </div>
+                        <div className={`text-sm ${
+                          s.status === 'done' ? 'text-emerald-400' :
+                          s.status === 'error' ? 'text-red-400' :
+                          s.status === 'active' ? 'text-purple-300' :
+                          'text-gray-400'
+                        }`}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Result */}
+                  {mintAddress && (
+                    <div className="mt-6 p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
+                      <h4 className="text-lg font-semibold text-emerald-300 mb-1">Token Created</h4>
+                      <div className="text-sm text-gray-300">
+                        <div>Mint Address: <span className="font-mono text-emerald-400">{mintAddress}</span></div>
+                        <div>Symbol: <span className="font-semibold">{formData.tokenSymbol.toUpperCase()}</span> • Decimals: <span className="font-semibold">{formData.tokenDecimals}</span> • Supply: <span className="font-semibold">{formData.totalSupply}</span></div>
+                        <div className="mt-2">
+                          <a
+                            href={`https://solscan.io/token/${mintAddress}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 underline"
+                          >
+                            View on Solscan
+                            <LinkIcon className="w-4 h-4" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Stepper */}
           <Stepper currentStep={currentStep} steps={steps} />

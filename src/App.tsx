@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { WalletProvider } from "@/context/WalletContext";
+import { useWallet } from "@/context/WalletContext";
 
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -27,20 +28,35 @@ const Home = () => (
   </>
 );
 
+const AppRoutes = () => {
+  const { walletConnected } = useWallet();
+  return (
+    <Routes>
+      {walletConnected ? (
+        <>
+          <Route path="/create-token" element={<CreateToken />} />
+          <Route path="*" element={<Navigate to="/create-token" replace />} />
+        </>
+      ) : (
+        <>
+          <Route path="/" element={<Home />} />
+          <Route path="/learn" element={<Index />} />
+          <Route path="/create-token" element={<CreateToken />} />
+          <Route path="/solana-coin-maker" element={<SolanaCoinMaker />} />
+          <Route path="*" element={<NotFound />} />
+        </>
+      )}
+    </Routes>
+  );
+};
+
 const App = () => {
   return (
     <WalletProvider>
       <Router>
         <div className="min-h-screen">
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-             <Route path="/learn" element={<Index />} />
-             <Route path="/create-token" element={<CreateToken />} />
-            <Route path="/solana-coin-maker" element={<SolanaCoinMaker />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
           <Footer />
         </div>
       </Router>
