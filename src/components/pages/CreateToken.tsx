@@ -90,6 +90,16 @@ const CreateToken = () => {
     { label: 'Creating Token', status: 'pending' },
   ]);
   const [mintAddress, setMintAddress] = useState<string | null>(null);
+  type ToastType = 'info' | 'success' | 'error';
+  interface ToastItem { id: number; type: ToastType; message: string }
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const addToast = (type: ToastType, message: string) => {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    setToasts(prev => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
   const [formData, setFormData] = useState<TokenFormData>({
     tokenName: '',
     tokenSymbol: '',
@@ -254,6 +264,9 @@ const CreateToken = () => {
         try {
           const bal = await getWalletBalanceSOL(result.wallet);
           setWalletBalance(bal);
+          if (bal !== null) {
+            addToast('info', `Detected SOL balance: ${bal.toFixed(4)} SOL`);
+          }
         } catch {
           setWalletBalance(null);
         }
@@ -264,6 +277,7 @@ const CreateToken = () => {
            
            // If on mobile and error indicates redirect, give visual feedback
            if (isMobileDevice() && result.isMobile) {
+             addToast('info', 'Opening Phantom app. Approve the connection and return to this page.');
              setTimeout(() => setError(null), 3000); // Clear "Opening..." message after a few seconds
            }
         }
@@ -298,6 +312,7 @@ const CreateToken = () => {
   const handleCreateToken = async () => {
     if (!walletAddress) {
       setError('Please connect your wallet first');
+      addToast('error', 'Please connect your wallet first');
       return;
     }
 
@@ -323,6 +338,7 @@ const CreateToken = () => {
       setWalletBalance(bal);
       if (bal !== null && bal < 0.02) {
         setError('Insufficient SOL balance (need ~0.02 SOL for rent & fees)');
+        addToast('error', 'Insufficient SOL balance (need ~0.02 SOL)');
         setIsProcessing(false);
         setTxProgress([
           { label: 'Preparing Transaction', status: 'error' },
@@ -343,6 +359,9 @@ const CreateToken = () => {
       if (!signature) {
         setSuccess('Getting fee transaction...');
         const feeResult = await getFeeTransaction(walletAddress);
+        if (feeResult.feeAmount) {
+          addToast('info', `Fee required: ${feeResult.feeAmount} SOL`);
+        }
         
         if (!feeResult.success || !feeResult.serializedTransaction) {
           throw new Error(feeResult.error || 'Failed to get fee transaction');
@@ -355,17 +374,21 @@ const CreateToken = () => {
         );
 
         if (!feeSignResult.success || !feeSignResult.signature) {
+          addToast('error', feeSignResult.error || 'Fee transaction failed');
           throw new Error(feeSignResult.error || 'Failed to send fee transaction');
         }
 
         signature = feeSignResult.signature;
         setFeeTxSignature(signature);
+        addToast('success', 'Fee paid successfully');
         setTxProgress([
           { label: 'Preparing Transaction', status: 'done' },
           { label: 'Confirming', status: 'active' },
           { label: 'Processing', status: 'pending' },
           { label: 'Creating Token', status: 'pending' },
         ]);
+      } else {
+        addToast('info', 'Fee already paid');
       }
 
       // Step 3: Generate mint keypair if not already generated
@@ -431,6 +454,7 @@ const CreateToken = () => {
       const mintAddr = tokenSignResult.mintAddress;
       setMintAddress(mintAddr || null);
       setSuccess(`Token Created Successfully! Mint: ${mintAddr}`);
+      addToast('success', 'Token created successfully');
       setTxProgress([
         { label: 'Preparing Transaction', status: 'done' },
         { label: 'Confirming', status: 'done' },
@@ -471,6 +495,7 @@ const CreateToken = () => {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg || 'Failed to create token');
+      addToast('error', msg || 'Failed to create token');
       setTxProgress(prev => {
         const next = [...prev];
         const i = next.findIndex(s => s.status === 'active');
@@ -490,6 +515,23 @@ const CreateToken = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Toasts */}
+        <div className="fixed top-20 right-4 z-[200] space-y-2">
+          {toasts.map(t => (
+            <div
+              key={t.id}
+              className={`min-w-[280px] px-4 py-3 rounded-lg shadow-lg border ${
+                t.type === 'success'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                  : t.type === 'error'
+                  ? 'bg-red-500/10 border-red-500/30 text-red-300'
+                  : 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+              }`}
+            >
+              {t.message}
+            </div>
+          ))}
+        </div>
         {/* Error/Success Messages */}
         {error && (
           <motion.div

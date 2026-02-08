@@ -243,93 +243,47 @@ async function connectPhantomMobile(options?: {
   isMobile?: boolean;
 }> {
   try {
-    // First, wait a bit for Phantom to inject (in case user just returned from app)
     await waitForPhantom(3000);
-    
-    // Check if Phantom is available
     if (window.solana?.isPhantom) {
       const provider = window.solana;
-      
-      // Already connected
       if (provider.isConnected && provider.publicKey) {
-        return {
-          success: true,
-          publicKey: provider.publicKey.toBase58(),
-          isMobile: true,
-        };
+        return { success: true, publicKey: provider.publicKey.toBase58(), isMobile: true };
       }
-
-      // Try to connect
+      try {
+        const response = await provider.connect({ onlyIfTrusted: true });
+        return { success: true, publicKey: response.publicKey.toBase58(), isMobile: true };
+      } catch {}
       try {
         const response = await provider.connect();
-        return {
-          success: true,
-          publicKey: response.publicKey.toBase58(),
-          isMobile: true,
-        };
+        return { success: true, publicKey: response.publicKey.toBase58(), isMobile: true };
       } catch (error: any) {
         if (error?.code === 4001) {
-          return {
-            success: false,
-            error: "User rejected the connection request",
-            isMobile: true,
-          };
+          return { success: false, error: "User rejected the connection request", isMobile: true };
         }
-        
-        // If connection fails, try deep link
-        if (options?.redirectToMobile !== false) {
-          openPhantomMobileApp();
-        }
-        return {
-          success: false,
-          error: "Please approve the connection in Phantom app",
-          isMobile: true,
-        };
       }
     }
-
-    // Phantom not detected - try deep link
     if (options?.redirectToMobile !== false) {
-      // Store current URL for return
       const currentUrl = window.location.href;
       sessionStorage.setItem('phantom_return_url', currentUrl);
-      
-      // Open deep link
+      sessionStorage.setItem('phantom_connecting', '1');
       openPhantomMobileApp(currentUrl);
-      
-      // Wait a bit to see if user approves and returns
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Check again if Phantom injected
-      if (window.solana?.isPhantom) {
-        try {
-          const response = await window.solana.connect();
-          return {
-            success: true,
-            publicKey: response.publicKey.toBase58(),
-            isMobile: true,
-          };
-        } catch (err: any) {
-          return {
-            success: false,
-            error: "Please approve the connection in Phantom app and return to this page",
-            isMobile: true,
-          };
+      const start = Date.now();
+      while (Date.now() - start < 10000) {
+        if (window.solana?.isPhantom) {
+          try {
+            const resp = await window.solana.connect({ onlyIfTrusted: true });
+            return { success: true, publicKey: resp.publicKey.toBase58(), isMobile: true };
+          } catch {}
+          try {
+            const resp = await window.solana.connect();
+            return { success: true, publicKey: resp.publicKey.toBase58(), isMobile: true };
+          } catch {}
         }
+        await new Promise(r => setTimeout(r, 400));
       }
-      
-      return {
-        success: false,
-        error: "Opening Phantom app. Please approve the connection and return to this page.",
-        isMobile: true,
-      };
+      return { success: false, error: "Opening Phantom app. Approve and return to this page.", isMobile: true };
     }
-
-    return {
-      success: false,
-      error: "Phantom app not detected. Please install Phantom from App Store or Play Store.",
-      isMobile: true,
-    };
+    return { success: false, error: "Phantom app not detected. Install Phantom.", isMobile: true };
   } catch (error: any) {
     return {
       success: false,
