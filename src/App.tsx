@@ -6,7 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Index from "./components/pages/index";
 import SolanaCoinMaker from "./components/pages/SolanaCoinMaker";
-import Createtokens from "./components/pages/Createtokens";
+import Createtokens from "./components/pages/CreateToken";
 import NotFound from "./components/pages/NotFound";
 import Hero from '@/components/sections/Hero';
 import Stats from '@/components/sections/Stats';

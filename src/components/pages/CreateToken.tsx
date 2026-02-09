@@ -31,7 +31,7 @@ import {
   generateMintKeypair,
   uploadToIPFS,
   getWalletBalanceSOL
-} from '@/services/tokensService';
+} from '@/services/tokenService';
 import { Keypair } from '@solana/web3.js';
 import { 
   isPhantomInstalled, 
