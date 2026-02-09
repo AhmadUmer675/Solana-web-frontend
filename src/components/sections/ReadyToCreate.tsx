@@ -23,10 +23,10 @@ const ReadyToCreate = () => {
           className="text-center max-w-2xl mx-auto"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to create your own token?
+            Ready to create your own tokens?
           </h2>
           <p className="text-gray-400 text-lg mb-8">
-            Join thousands of creators who have launched their own tokens on Solana.
+            Join thousands of creators who have launched their own tokenss on Solana.
           </p>
 
           <motion.button

@@ -8,7 +8,7 @@ import { useWallet } from "@/context/WalletContext";
 import { getPhantomStatus, isIOSDevice } from "@/lib/wallet";
 
 const navLinks = [
-  { name: "Create Token", path: "/create-token" },
+  { name: "Create tokens", path: "/create-tokens" },
   {
     name: "Create Liquidity",
     external: true,
@@ -20,7 +20,7 @@ const navLinks = [
     href: "https://raydium.io/portfolio/",
   },
   { name: "Learn", path: "/learn" },
-  { name: "Trending Tokens", path: "/trending", isNew: true },
+  { name: "Trending tokenss", path: "/trending", isNew: true },
 ];
 
 export default function Navbar() {
@@ -73,7 +73,7 @@ export default function Navbar() {
               onClick={() => navigate("/")}
               className="cursor-pointer text-xl font-bold bg-gradient-to-r from-purple-500 via-violet-500 to-cyan-400 bg-clip-text text-transparent"
             >
-              Solana Token Labs
+              Solana tokens lab
             </span>
 
             {/* Desktop Nav */}

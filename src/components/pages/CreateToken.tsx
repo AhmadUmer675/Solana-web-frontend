@@ -26,12 +26,12 @@ import { connectPhantomWallet, getCurrentWalletAddress } from '@/services/wallet
 import { 
   getFeeTransaction, 
   signAndSendFeeTransaction,
-  createTokenOnBackend,
-  signAndSendTokenTransaction,
+  createtokensOnBackend,
+  signAndSendtokensTransaction,
   generateMintKeypair,
   uploadToIPFS,
   getWalletBalanceSOL
-} from '@/services/tokenService';
+} from '@/services/tokensService';
 import { Keypair } from '@solana/web3.js';
 import { 
   isPhantomInstalled, 
@@ -40,18 +40,18 @@ import {
   openPhantomMobileApp
 } from '@/lib/wallet';
 
-interface TokenFormData {
-  // Step 1: Token Info
-  tokenName: string;
-  tokenSymbol: string;
-  tokenLogo: File | null;
+interface tokensFormData {
+  // Step 1: tokens Info
+  tokensName: string;
+  tokensSymbol: string;
+  tokensLogo: File | null;
   onChainName: boolean;
   onChainSymbol: boolean;
   
   // Step 2: Supply
-  tokenDecimals: number;
+  tokensDecimals: number;
   totalSupply: string;
-  tokenDescription: string;
+  tokensDescription: string;
   storeDescription: boolean;
   
   // Step 3: Details
@@ -69,7 +69,7 @@ interface TokenFormData {
 
 type WalletStatus = 'checking' | 'not_installed' | 'installed_disconnected' | 'connected';
 
-const CreateToken = () => {
+const Createtokens = () => {
   const [walletStatus, setWalletStatus] = useState<WalletStatus>('checking');
   const [currentStep, setCurrentStep] = useState(1);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
@@ -87,7 +87,7 @@ const CreateToken = () => {
     { label: 'Preparing Transaction', status: 'pending' },
     { label: 'Confirming', status: 'pending' },
     { label: 'Processing', status: 'pending' },
-    { label: 'Creating Token', status: 'pending' },
+    { label: 'Creating tokens', status: 'pending' },
   ]);
   const [mintAddress, setMintAddress] = useState<string | null>(null);
   type ToastType = 'info' | 'success' | 'error';
@@ -100,15 +100,15 @@ const CreateToken = () => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4000);
   };
-  const [formData, setFormData] = useState<TokenFormData>({
-    tokenName: '',
-    tokenSymbol: '',
-    tokenLogo: null,
+  const [formData, setFormData] = useState<tokensFormData>({
+    tokensName: '',
+    tokensSymbol: '',
+    tokensLogo: null,
     onChainName: true,
     onChainSymbol: true,
-    tokenDecimals: 9,
+    tokensDecimals: 9,
     totalSupply: '1000000000',
-    tokenDescription: '',
+    tokensDescription: '',
     storeDescription: true,
     enableSocials: true,
     website: '',
@@ -123,18 +123,18 @@ const CreateToken = () => {
   });
 
   const steps = [
-    { id: 1, label: 'Token Info', icon: <Info className="w-6 h-6" /> },
+    { id: 1, label: 'tokens Info', icon: <Info className="w-6 h-6" /> },
     { id: 2, label: 'Supply', icon: <Link2 className="w-6 h-6" /> },
     { id: 3, label: 'Details', icon: <Shield className="w-6 h-6" /> },
   ];
 
-  const updateFormData = <K extends keyof TokenFormData>(field: K, value: TokenFormData[K]) => {
+  const updateFormData = <K extends keyof tokensFormData>(field: K, value: tokensFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleDecimalsChange = (delta: number) => {
-    const newDecimals = Math.max(0, Math.min(18, formData.tokenDecimals + delta));
-    updateFormData('tokenDecimals', newDecimals);
+    const newDecimals = Math.max(0, Math.min(18, formData.tokensDecimals + delta));
+    updateFormData('tokensDecimals', newDecimals);
     
     // Recalculate total supply display if needed, but usually supply is input as base
     // Here we just keep the supply string as is
@@ -171,14 +171,14 @@ const CreateToken = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      updateFormData('tokenLogo', file);
+      updateFormData('tokensLogo', file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
   };
 
   const removeLogo = () => {
-    updateFormData('tokenLogo', null);
+    updateFormData('tokensLogo', null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -309,15 +309,15 @@ const CreateToken = () => {
     }
   }, [currentStep, mintKeypair]);
 
-  const handleCreateToken = async () => {
+  const handleCreatetokens = async () => {
     if (!walletAddress) {
       setError('Please connect your wallet first');
       addToast('error', 'Please connect your wallet first');
       return;
     }
 
-    if (!formData.tokenName.trim() || !formData.tokenSymbol.trim()) {
-      setError('Please fill in token name and symbol');
+    if (!formData.tokensName.trim() || !formData.tokensSymbol.trim()) {
+      setError('Please fill in tokens name and symbol');
       return;
     }
 
@@ -329,7 +329,7 @@ const CreateToken = () => {
       { label: 'Preparing Transaction', status: 'active' },
       { label: 'Confirming', status: 'pending' },
       { label: 'Processing', status: 'pending' },
-      { label: 'Creating Token', status: 'pending' },
+      { label: 'Creating tokens', status: 'pending' },
     ]);
 
     // Auto-detect SOL amount and block if insufficient
@@ -344,7 +344,7 @@ const CreateToken = () => {
           { label: 'Preparing Transaction', status: 'error' },
           { label: 'Confirming', status: 'pending' },
           { label: 'Processing', status: 'pending' },
-          { label: 'Creating Token', status: 'pending' },
+          { label: 'Creating tokens', status: 'pending' },
         ]);
         return;
       }
@@ -385,7 +385,7 @@ const CreateToken = () => {
           { label: 'Preparing Transaction', status: 'done' },
           { label: 'Confirming', status: 'active' },
           { label: 'Processing', status: 'pending' },
-          { label: 'Creating Token', status: 'pending' },
+          { label: 'Creating tokens', status: 'pending' },
         ]);
       } else {
         addToast('info', 'Fee already paid');
@@ -400,32 +400,32 @@ const CreateToken = () => {
 
       // Step 4: Upload logo to IPFS if provided
       let logoUri = null;
-      if (formData.tokenLogo) {
+      if (formData.tokensLogo) {
         setSuccess('Uploading logo to IPFS...');
-        const uploadResult = await uploadToIPFS(formData.tokenLogo);
+        const uploadResult = await uploadToIPFS(formData.tokensLogo);
         
         if (!uploadResult.success || !uploadResult.url) {
-           // Fallback or warning - but proceed to create token without logo? 
+           // Fallback or warning - but proceed to create tokens without logo? 
            // Better to throw error if user expects logo
            throw new Error(uploadResult.error || 'Failed to upload logo');
         }
         logoUri = uploadResult.url;
       }
 
-      // Step 5: Create token on backend with all metadata
-      setSuccess('Creating token metadata...');
+      // Step 5: Create tokens on backend with all metadata
+      setSuccess('Creating tokens metadata...');
       setTxProgress([
         { label: 'Preparing Transaction', status: 'done' },
         { label: 'Confirming', status: 'done' },
         { label: 'Processing', status: 'active' },
-        { label: 'Creating Token', status: 'pending' },
+        { label: 'Creating tokens', status: 'pending' },
       ]);
-      const createResult = await createTokenOnBackend(walletAddress, {
-        tokenName: formData.tokenName.trim(),
-        symbol: formData.tokenSymbol.trim().toUpperCase(),
+      const createResult = await createtokensOnBackend(walletAddress, {
+        tokensName: formData.tokensName.trim(),
+        symbol: formData.tokensSymbol.trim().toUpperCase(),
         supply: formData.totalSupply,
-        decimals: formData.tokenDecimals,
-        description: formData.storeDescription ? formData.tokenDescription.trim() : undefined,
+        decimals: formData.tokensDecimals,
+        description: formData.storeDescription ? formData.tokensDescription.trim() : undefined,
         logoUri: logoUri || undefined,
         website: formData.enableSocials && formData.website ? formData.website.trim() : undefined,
         twitter: formData.enableSocials && formData.twitter ? formData.twitter.trim() : undefined,
@@ -436,30 +436,30 @@ const CreateToken = () => {
       });
 
       if (!createResult.success || !createResult.serializedTransaction) {
-        throw new Error(createResult.error || 'Failed to create token');
+        throw new Error(createResult.error || 'Failed to create tokens');
       }
 
-      // Step 5: Sign and send token transaction
-      setSuccess('Please sign the token creation transaction in Phantom...');
-      const tokenSignResult = await signAndSendTokenTransaction(
+      // Step 5: Sign and send tokens transaction
+      setSuccess('Please sign the tokens creation transaction in Phantom...');
+      const tokensSignResult = await signAndSendtokensTransaction(
         createResult.serializedTransaction,
         mintKey
       );
 
-      if (!tokenSignResult.success) {
-        throw new Error(tokenSignResult.error || 'Failed to send token transaction');
+      if (!tokensSignResult.success) {
+        throw new Error(tokensSignResult.error || 'Failed to send tokens transaction');
       }
 
       // Success!
-      const mintAddr = tokenSignResult.mintAddress;
+      const mintAddr = tokensSignResult.mintAddress;
       setMintAddress(mintAddr || null);
-      setSuccess(`Token Created Successfully! Mint: ${mintAddr}`);
-      addToast('success', 'Token created successfully');
+      setSuccess(`tokens Created Successfully! Mint: ${mintAddr}`);
+      addToast('success', 'tokens created successfully');
       setTxProgress([
         { label: 'Preparing Transaction', status: 'done' },
         { label: 'Confirming', status: 'done' },
         { label: 'Processing', status: 'done' },
-        { label: 'Creating Token', status: 'done' },
+        { label: 'Creating tokens', status: 'done' },
       ]);
       
       // Reset form after 10 seconds
@@ -467,14 +467,14 @@ const CreateToken = () => {
         setSuccess(null);
         setCurrentStep(1);
         setFormData({
-          tokenName: '',
-          tokenSymbol: '',
-          tokenLogo: null,
+          tokensName: '',
+          tokensSymbol: '',
+          tokensLogo: null,
           onChainName: false,
           onChainSymbol: false,
-          tokenDecimals: 9,
+          tokensDecimals: 9,
           totalSupply: '1000000000',
-          tokenDescription: '',
+          tokensDescription: '',
           storeDescription: false,
           enableSocials: false,
           website: '',
@@ -494,8 +494,8 @@ const CreateToken = () => {
 
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setError(msg || 'Failed to create token');
-      addToast('error', msg || 'Failed to create token');
+      setError(msg || 'Failed to create tokens');
+      addToast('error', msg || 'Failed to create tokens');
       setTxProgress(prev => {
         const next = [...prev];
         const i = next.findIndex(s => s.status === 'active');
@@ -577,7 +577,7 @@ const CreateToken = () => {
             <Download className="w-16 h-16 mx-auto mb-6 text-purple-400" />
             <h2 className="text-2xl font-bold mb-4">Get Started with Solana</h2>
             <p className="text-gray-300 mb-8 max-w-lg mx-auto">
-              To create tokens, you need a Solana wallet. We recommend Phantom - it's safe, easy to use, and works on all devices.
+              To create tokenss, you need a Solana wallet. We recommend Phantom - it's safe, easy to use, and works on all devices.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
@@ -618,7 +618,7 @@ const CreateToken = () => {
             <Wallet className="w-16 h-16 mx-auto mb-6 text-purple-400" />
             <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
             <p className="text-gray-300 mb-8">
-              Connect your Phantom wallet to start creating your token.
+              Connect your Phantom wallet to start creating your tokens.
             </p>
             <button
               onClick={handleConnect}
@@ -661,7 +661,7 @@ const CreateToken = () => {
         >
           {/* Title */}
           <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent text-center">
-            Create Your Solana Token
+            Create Your Solana tokens
           </h1>
           
           {/* Connected Wallet Info */}
@@ -706,9 +706,9 @@ const CreateToken = () => {
                     <X />
                   </button>
 
-                  <h3 className="text-2xl font-semibold mb-1">Creating Your Token</h3>
+                  <h3 className="text-2xl font-semibold mb-1">Creating Your tokens</h3>
                   <p className="text-sm text-gray-400 mb-4">
-                    We’re setting up your token on the Solana network. This process usually takes about 30 seconds.
+                    We’re setting up your tokens on the Solana network. This process usually takes about 30 seconds.
                   </p>
 
                   <div className="space-y-3">
@@ -737,13 +737,13 @@ const CreateToken = () => {
                   {/* Result */}
                   {mintAddress && (
                     <div className="mt-6 p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
-                      <h4 className="text-lg font-semibold text-emerald-300 mb-1">Token Created</h4>
+                      <h4 className="text-lg font-semibold text-emerald-300 mb-1">tokens Created</h4>
                       <div className="text-sm text-gray-300">
                         <div>Mint Address: <span className="font-mono text-emerald-400">{mintAddress}</span></div>
-                        <div>Symbol: <span className="font-semibold">{formData.tokenSymbol.toUpperCase()}</span> • Decimals: <span className="font-semibold">{formData.tokenDecimals}</span> • Supply: <span className="font-semibold">{formData.totalSupply}</span></div>
+                        <div>Symbol: <span className="font-semibold">{formData.tokensSymbol.toUpperCase()}</span> • Decimals: <span className="font-semibold">{formData.tokensDecimals}</span> • Supply: <span className="font-semibold">{formData.totalSupply}</span></div>
                         <div className="mt-2">
                           <a
-                            href={`https://solscan.io/token/${mintAddress}`}
+                            href={`https://solscan.io/tokens/${mintAddress}`}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 underline"
@@ -773,12 +773,12 @@ const CreateToken = () => {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-semibold mb-6">Token Basic Information</h2>
+                <h2 className="text-2xl font-semibold mb-6">tokens Basic Information</h2>
 
-                {/* Token Name */}
+                {/* tokens Name */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-300">Token Name</label>
+                    <label className="text-sm font-medium text-gray-300">tokens Name</label>
                     <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
                       <input
                         type="checkbox"
@@ -791,19 +791,19 @@ const CreateToken = () => {
                   </div>
                   <input
                     type="text"
-                    value={formData.tokenName}
-                    onChange={(e) => updateFormData('tokenName', e.target.value)}
+                    value={formData.tokensName}
+                    onChange={(e) => updateFormData('tokensName', e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                     placeholder="Cosmic Coin"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Enter the full name of your token</p>
+                  <p className="text-xs text-gray-500 mt-1">Enter the full name of your tokens</p>
                 </div>
 
-                {/* Token Symbol */}
+                {/* tokens Symbol */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-gray-300">Token Symbol</label>
+                      <label className="text-sm font-medium text-gray-300">tokens Symbol</label>
                       <span className="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 rounded border border-purple-500/30">
                         Solana Official
                       </span>
@@ -820,19 +820,19 @@ const CreateToken = () => {
                   </div>
                   <input
                     type="text"
-                    value={formData.tokenSymbol}
-                    onChange={(e) => updateFormData('tokenSymbol', e.target.value.toUpperCase())}
+                    value={formData.tokensSymbol}
+                    onChange={(e) => updateFormData('tokensSymbol', e.target.value.toUpperCase())}
                     maxLength={5}
                     className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                     placeholder="CSMC"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Short symbol (2-5 characters) that identifies your token</p>
+                  <p className="text-xs text-gray-500 mt-1">Short symbol (2-5 characters) that identifies your tokens</p>
                 </div>
 
-                {/* Token Logo */}
+                {/* tokens Logo */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-300">Token Logo</label>
+                    <label className="text-sm font-medium text-gray-300">tokens Logo</label>
                     <span className="px-2 py-0.5 text-xs bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30 flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       IPFS Storage
@@ -843,7 +843,7 @@ const CreateToken = () => {
                     <div className="relative group border-2 border-purple-500/50 rounded-xl p-4 bg-gray-800/30 text-center">
                        <img 
                          src={previewUrl} 
-                         alt="Token Preview" 
+                         alt="tokens Preview" 
                          className="w-32 h-32 mx-auto rounded-lg object-cover shadow-lg mb-4"
                        />
                        <div className="flex justify-center">
@@ -873,7 +873,7 @@ const CreateToken = () => {
                       </div>
                     </label>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">Your logo will be stored on IPFS and linked in your token's on-chain metadata</p>
+                  <p className="text-xs text-gray-500 mt-1">Your logo will be stored on IPFS and linked in your tokens's on-chain metadata</p>
                 </div>
 
                 {/* Next Button */}
@@ -896,11 +896,11 @@ const CreateToken = () => {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-semibold mb-6">Token Supply Configuration</h2>
+                <h2 className="text-2xl font-semibold mb-6">tokens Supply Configuration</h2>
 
-                {/* Token Decimals */}
+                {/* tokens Decimals */}
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 block">Token Decimals</label>
+                  <label className="text-sm font-medium text-gray-300 mb-2 block">tokens Decimals</label>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleDecimalsChange(-1)}
@@ -910,11 +910,11 @@ const CreateToken = () => {
                     </button>
                     <input
                       type="number"
-                      value={formData.tokenDecimals}
+                      value={formData.tokensDecimals}
                       onChange={(e) => {
                         const val = parseInt(e.target.value) || 0;
                         if (val >= 0 && val <= 18) {
-                          handleDecimalsChange(val - formData.tokenDecimals);
+                          handleDecimalsChange(val - formData.tokensDecimals);
                         }
                       }}
                       className="flex-1 px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white text-center focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
@@ -933,11 +933,11 @@ const CreateToken = () => {
                       <input
                         type="radio"
                         name="decimals"
-                        checked={formData.tokenDecimals === 9}
+                        checked={formData.tokensDecimals === 9}
                         onChange={() => {
-                          updateFormData('tokenDecimals', 9);
+                          updateFormData('tokensDecimals', 9);
                           const currentSupply = parseFloat(formData.totalSupply) || 0;
-                          const multiplier = Math.pow(10, 9 - formData.tokenDecimals);
+                          const multiplier = Math.pow(10, 9 - formData.tokensDecimals);
                           updateFormData('totalSupply', (currentSupply * multiplier).toString());
                         }}
                         className="w-4 h-4"
@@ -945,7 +945,7 @@ const CreateToken = () => {
                       Solana Standard: 9
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">Decimals determine the divisibility of your token. 9 decimals is the Solana standard for most tokens.</p>
+                  <p className="text-xs text-gray-500 mt-2">Decimals determine the divisibility of your tokens. 9 decimals is the Solana standard for most tokenss.</p>
                 </div>
 
                 {/* Total Supply */}
@@ -957,7 +957,7 @@ const CreateToken = () => {
                       Solana Official
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mb-2">Based on {formData.tokenDecimals} decimals</p>
+                  <p className="text-xs text-gray-500 mb-2">Based on {formData.tokensDecimals} decimals</p>
                   <input
                     type="text"
                     value={formData.totalSupply}
@@ -969,16 +969,16 @@ const CreateToken = () => {
                     placeholder="10000000000000"
                   />
                   <p className="text-xs text-emerald-400 mt-2">
-                    Total supply with decimals: {formatSupply(formData.totalSupply, formData.tokenDecimals)} tokens ({formatSupply(formData.totalSupply, formData.tokenDecimals).replace(/,/g, '') === '10000000000000' ? 'Ten Trillion' : 'Custom Amount'})
+                    Total supply with decimals: {formatSupply(formData.totalSupply, formData.tokensDecimals)} tokenss ({formatSupply(formData.totalSupply, formData.tokensDecimals).replace(/,/g, '') === '10000000000000' ? 'Ten Trillion' : 'Custom Amount'})
                   </p>
                 </div>
 
-                {/* Token Description */}
+                {/* tokens Description */}
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 block">Token Description</label>
+                  <label className="text-sm font-medium text-gray-300 mb-2 block">tokens Description</label>
                   <textarea
-                    value={formData.tokenDescription}
-                    onChange={(e) => updateFormData('tokenDescription', e.target.value)}
+                    value={formData.tokensDescription}
+                    onChange={(e) => updateFormData('tokensDescription', e.target.value)}
                     rows={4}
                     className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 resize-none"
                     placeholder="Official 1000 digital asset designed for seamless integration with the blockchain ecosystem."
@@ -991,10 +991,10 @@ const CreateToken = () => {
                         onChange={(e) => updateFormData('storeDescription', e.target.checked)}
                         className="w-4 h-4 rounded"
                       />
-                      Stored in official token metadata
+                      Stored in official tokens metadata
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">This description will be stored in your token's on-chain metadata and displayed in wallets and explorers.</p>
+                  <p className="text-xs text-gray-500 mt-2">This description will be stored in your tokens's on-chain metadata and displayed in wallets and explorers.</p>
                 </div>
 
                 {/* Navigation Buttons */}
@@ -1023,10 +1023,10 @@ const CreateToken = () => {
                 exit={{ opacity: 0, x: 20 }}
                 className="space-y-6"
               >
-                {/* Token Details & Socials */}
+                {/* tokens Details & Socials */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Token Details & Socials</h3>
+                    <h3 className="text-lg font-semibold">tokens Details & Socials</h3>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <span className="text-sm text-gray-400">Enable Socials</span>
                       <div
@@ -1103,7 +1103,7 @@ const CreateToken = () => {
                   <div className="flex items-center justify-between mb-2">
                     <div>
                       <h3 className="text-lg font-semibold mb-1">Modify Creator Information</h3>
-                      <p className="text-sm text-gray-400">Change the information of the creator in the metadata. By default, it is Solana Token Labs.</p>
+                      <p className="text-sm text-gray-400">Change the information of the creator in the metadata. By default, it is Solana tokens lab.</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-emerald-400">+0.10 SOL</span>
@@ -1123,12 +1123,12 @@ const CreateToken = () => {
                   </div>
                 </div>
 
-                {/* Custom Token Address */}
+                {/* Custom tokens Address */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h3 className="text-lg font-semibold mb-1">Custom Token Address</h3>
-                      <p className="text-sm text-gray-400">Generate a token with a custom address suffix (up to 4 characters).</p>
+                      <h3 className="text-lg font-semibold mb-1">Custom tokens Address</h3>
+                      <p className="text-sm text-gray-400">Generate a tokens with a custom address suffix (up to 4 characters).</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-emerald-400">+0.20 SOL</span>
@@ -1148,9 +1148,9 @@ const CreateToken = () => {
                   </div>
                 </div>
 
-                {/* Revoke Token Authorities */}
+                {/* Revoke tokens Authorities */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Revoke Token Authorities</h3>
+                  <h3 className="text-lg font-semibold mb-2">Revoke tokens Authorities</h3>
                   <p className="text-sm text-gray-400 mb-4">
                     Understanding authorities: When <span className="text-emerald-400">selected (checked)</span>, the authority will be permanently revoked (set to null). When <span className="text-emerald-400">unselected (unchecked)</span>, the authority will be transferred to your wallet.
                   </p>
@@ -1165,7 +1165,7 @@ const CreateToken = () => {
                         <X className="w-6 h-6 text-white" />
                       </div>
                       <h4 className="font-semibold text-center mb-2">Revoke Freeze</h4>
-                      <p className="text-xs text-gray-400 text-center mb-4">Freeze Authority allows freezing token accounts. Revoke it to prevent tokens from being frozen.</p>
+                      <p className="text-xs text-gray-400 text-center mb-4">Freeze Authority allows freezing tokens accounts. Revoke it to prevent tokenss from being frozen.</p>
                       <button
                         onClick={() => updateFormData('revokeFreeze', !formData.revokeFreeze)}
                         className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -1187,7 +1187,7 @@ const CreateToken = () => {
                         <Link2 className="w-6 h-6 text-white" />
                       </div>
                       <h4 className="font-semibold text-center mb-2">Revoke Mint</h4>
-                      <p className="text-xs text-gray-400 text-center mb-4">Mint Authority allows creating more tokens. Revoke it to make supply fixed and prevent inflation.</p>
+                      <p className="text-xs text-gray-400 text-center mb-4">Mint Authority allows creating more tokenss. Revoke it to make supply fixed and prevent inflation.</p>
                       <button
                         onClick={() => updateFormData('revokeMint', !formData.revokeMint)}
                         className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -1209,7 +1209,7 @@ const CreateToken = () => {
                         <Info className="w-6 h-6 text-white" />
                       </div>
                       <h4 className="font-semibold text-center mb-2">Revoke Update</h4>
-                      <p className="text-xs text-gray-400 text-center mb-4">Update Authority allows changing token metadata. Revoke it to make metadata permanent.</p>
+                      <p className="text-xs text-gray-400 text-center mb-4">Update Authority allows changing tokens metadata. Revoke it to make metadata permanent.</p>
                       <button
                         onClick={() => updateFormData('revokeUpdate', !formData.revokeUpdate)}
                         className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -1233,7 +1233,7 @@ const CreateToken = () => {
                     Back
                   </button>
                   <button
-                    onClick={handleCreateToken}
+                    onClick={handleCreatetokens}
                     disabled={isProcessing || !walletAddress}
                     className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-purple-600 text-white font-semibold hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
@@ -1243,7 +1243,7 @@ const CreateToken = () => {
                         Processing...
                       </>
                     ) : (
-                      `Create Token (${calculateTotalCost()} SOL)`
+                      `Create tokens (${calculateTotalCost()} SOL)`
                     )}
                   </button>
                 </div>
@@ -1263,4 +1263,4 @@ const CreateToken = () => {
   );
 };
 
-export default CreateToken;
+export default Createtokens;

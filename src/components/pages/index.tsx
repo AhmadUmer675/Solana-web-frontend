@@ -15,11 +15,11 @@ const Index = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Solana Token Knowledge Center
+            Solana tokens Knowledge Center
           </h1>
 
           <p className="text-white/80 text-lg max-w-2xl mx-auto">
-            Learn everything you need to know about creating, managing, and optimizing your Solana tokens
+            Learn everything you need to know about creating, managing, and optimizing your Solana tokenss
           </p>
         </div>
 
@@ -28,15 +28,15 @@ const Index = () => {
           <KnowledgeCard
             icon={<Coins className="h-6 w-6 text-white" />}
             title="Solana Coin Maker"
-            description="Learn the complete process of creating your own Solana token, from designing tokenomics to deployment."
+            description="Learn the complete process of creating your own Solana tokens, from designing tokensomics to deployment."
             linkText="Comprehensive Guide"
             to="/solana-coin-maker"
           />
 
           <KnowledgeCard
             icon={<Share2 className="h-6 w-6 text-white" />}
-            title="Token Distribution Strategies"
-            description="Learn effective strategies for distributing your token to build a strong community and market presence."
+            title="tokens Distribution Strategies"
+            description="Learn effective strategies for distributing your tokens to build a strong community and market presence."
             comingSoon
             disabled
           />
@@ -44,15 +44,15 @@ const Index = () => {
           <KnowledgeCard
             icon={<Droplets className="h-6 w-6 text-white" />}
             title="Liquidity Management"
-            description="Understand how to provide and manage liquidity for your token to ensure stable trading."
+            description="Understand how to provide and manage liquidity for your tokens to ensure stable trading."
             comingSoon
             disabled
           />
 
           <KnowledgeCard
             icon={<Shield className="h-6 w-6 text-white" />}
-            title="Token Security Best Practices"
-            description="Learn how to secure your token and protect your community from common security threats."
+            title="tokens Security Best Practices"
+            description="Learn how to secure your tokens and protect your community from common security threats."
             comingSoon
             disabled
           />

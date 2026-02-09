@@ -6,7 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Index from "./components/pages/index";
 import SolanaCoinMaker from "./components/pages/SolanaCoinMaker";
-import CreateToken from "./components/pages/CreateToken";
+import Createtokens from "./components/pages/Createtokens";
 import NotFound from "./components/pages/NotFound";
 import Hero from '@/components/sections/Hero';
 import Stats from '@/components/sections/Stats';
@@ -34,14 +34,14 @@ const AppRoutes = () => {
     <Routes>
       {walletConnected ? (
         <>
-          <Route path="/create-token" element={<CreateToken />} />
-          <Route path="*" element={<Navigate to="/create-token" replace />} />
+          <Route path="/create-tokens" element={<Createtokens />} />
+          <Route path="*" element={<Navigate to="/create-tokens" replace />} />
         </>
       ) : (
         <>
           <Route path="/" element={<Home />} />
           <Route path="/learn" element={<Index />} />
-          <Route path="/create-token" element={<CreateToken />} />
+          <Route path="/create-tokens" element={<Createtokens />} />
           <Route path="/solana-coin-maker" element={<SolanaCoinMaker />} />
           <Route path="*" element={<NotFound />} />
         </>

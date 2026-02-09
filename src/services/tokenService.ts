@@ -19,19 +19,19 @@ export interface FeeTransactionResponse {
   error?: string;
 }
 
-export interface CreateTokenResponse {
+export interface CreatetokensResponse {
   success: boolean;
   serializedTransaction?: string;
   lastValidBlockHeight?: number;
   mintAddress?: string;
-  tokenId?: number;
+  tokensId?: number;
   feePaid?: boolean;
   message?: string;
   error?: string;
 }
 
-export interface CreateTokenParams {
-  tokenName: string;
+export interface CreatetokensParams {
+  tokensName: string;
   symbol: string;
   supply: string | number;
   decimals?: number;
@@ -64,7 +64,7 @@ export async function uploadToIPFS(file: File) {
 /* ===================== API CALLS ===================== */
 
 export async function getFeeTransaction(walletAddress: string) {
-  const response = await apiRequest<FeeTransactionResponse>('/token/fee-transaction', {
+  const response = await apiRequest<FeeTransactionResponse>('/tokens/fee-transaction', {
     method: 'POST',
     body: JSON.stringify({ wallet: walletAddress }),
   });
@@ -116,13 +116,13 @@ export async function signAndSendFeeTransaction(
   }
 }
 
-/* ===================== TOKEN CREATION ===================== */
+/* ===================== tokens CREATION ===================== */
 
-export async function createTokenOnBackend(
+export async function createtokensOnBackend(
   walletAddress: string,
-  params: CreateTokenParams
+  params: CreatetokensParams
 ) {
-  const response = await apiRequest<CreateTokenResponse>('/token/create', {
+  const response = await apiRequest<CreatetokensResponse>('/tokens/create', {
     method: 'POST',
     body: JSON.stringify({ wallet: walletAddress, ...params }),
   });
@@ -134,7 +134,7 @@ export async function createTokenOnBackend(
   return { success: true, ...response.data };
 }
 
-export async function signAndSendTokenTransaction(
+export async function signAndSendtokensTransaction(
   serializedTransaction: string,
   mintKeypair: Keypair
 ) {

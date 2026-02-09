@@ -15,7 +15,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <p className="text-xs text-white/50 text-center">
-          © 2026 Solana Token Labs. All rights reserved.
+          © 2026 Solana tokens lab. All rights reserved.
         </p>
       </div>
     </footer>

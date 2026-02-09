@@ -49,7 +49,7 @@ const SolanaCoinMaker = () => {
           </h1>
 
           <p className="text-white/80 text-lg">
-            A step-by-step guide to creating and launching your own Solana token
+            A step-by-step guide to creating and launching your own Solana tokens
           </p>
         </div>
 
@@ -60,15 +60,15 @@ const SolanaCoinMaker = () => {
           </h2>
           <ul className="space-y-2">
             {[
-              "What is a Solana Token?",
-              "Why Use Solana for Token Creation?",
-              "Step-by-Step Guide to Creating Your Token",
-              "Designing Token Economics",
-              "Key Concepts of Solana Tokenomics",
-              "Deploying Your Token",
-              "Ready to Create Your Solana Token?",
-              "What Happens After You've Created Your Token?",
-              "Listing Your Solana Token: Step-by-Step",
+              "What is a Solana tokens?",
+              "Why Use Solana for tokens Creation?",
+              "Step-by-Step Guide to Creating Your tokens",
+              "Designing tokens Economics",
+              "Key Concepts of Solana tokensomics",
+              "Deploying Your tokens",
+              "Ready to Create Your Solana tokens?",
+              "What Happens After You've Created Your tokens?",
+              "Listing Your Solana tokens: Step-by-Step",
             ].map((item, index) => (
               <li
                 key={index}
@@ -86,11 +86,11 @@ const SolanaCoinMaker = () => {
           {/* Section */}
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">
-              What is a Solana Token?
+              What is a Solana tokens?
             </h2>
             <p className="text-white/80 mb-4 leading-relaxed">
-              A Solana token is a digital asset built on the Solana blockchain
-              using the SPL token standard.
+              A Solana tokens is a digital asset built on the Solana blockchain
+              using the SPL tokens standard.
             </p>
             <p className="text-white/80 leading-relaxed">
               Solana offers extremely low fees and high transaction speed
@@ -101,7 +101,7 @@ const SolanaCoinMaker = () => {
           {/* Advantages */}
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">
-              Why Use Solana for Token Creation?
+              Why Use Solana for tokens Creation?
             </h2>
 
             <div className="space-y-3">
@@ -134,7 +134,7 @@ const SolanaCoinMaker = () => {
               <div>
                 <h3 className="font-semibold text-purple-400 mb-2">Pro Tip</h3>
                 <p className="text-white/80 text-sm">
-                  Always test your token on Solana devnet before deploying to
+                  Always test your tokens on Solana devnet before deploying to
                   mainnet.
                 </p>
               </div>
@@ -150,7 +150,7 @@ const SolanaCoinMaker = () => {
                   Important Notice
                 </h3>
                 <p className="text-white/80 text-sm">
-                  Token creation may have legal implications. Always consult a
+                  tokens creation may have legal implications. Always consult a
                   legal expert.
                 </p>
               </div>
@@ -160,10 +160,10 @@ const SolanaCoinMaker = () => {
           {/* CTA */}
           <section className="text-center py-8">
             <h2 className="text-2xl font-bold text-white mb-4">
-              Ready to Create Your Token?
+              Ready to Create Your tokens?
             </h2>
             <p className="text-white/70 mb-6">
-              Start building your Solana token today.
+              Start building your Solana tokens today.
             </p>
             <button className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition">
               Get Started

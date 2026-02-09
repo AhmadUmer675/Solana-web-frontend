@@ -2,7 +2,7 @@
 
 ## Overview
 
-The frontend has been fully integrated with the Solana Token Launcher backend API. All token creation functionality now works with real backend endpoints.
+The frontend has been fully integrated with the Solana tokens Launcher backend API. All tokens creation functionality now works with real backend endpoints.
 
 ## What Was Integrated
 
@@ -17,10 +17,10 @@ The frontend has been fully integrated with the Solana Token Launcher backend AP
 - Backend wallet registration
 - Wallet address management
 
-### 3. Token Service (`src/services/tokenService.ts`)
+### 3. tokens Service (`src/services/tokensService.ts`)
 - Fee transaction retrieval
 - Transaction signing and sending
-- Token creation API calls
+- tokens creation API calls
 - Mint keypair generation
 
 ### 4. Wallet Library (`src/lib/wallet.ts`)
@@ -31,10 +31,10 @@ The frontend has been fully integrated with the Solana Token Launcher backend AP
 
 ### 5. Updated Components
 
-#### CreateToken Component
+#### Createtokens Component
 - ✅ Real wallet connection on mount
 - ✅ Fee transaction handling
-- ✅ Token creation with backend API
+- ✅ tokens creation with backend API
 - ✅ Loading states and error handling
 - ✅ Success messages
 - ✅ Transaction signing flow
@@ -51,31 +51,31 @@ The frontend has been fully integrated with the Solana Token Launcher backend AP
    - Connects and validates Phantom wallet
    - Used in: `walletService.ts`
 
-2. **POST /api/token/fee-transaction**
+2. **POST /api/tokens/fee-transaction**
    - Gets unsigned 0.10 SOL fee transaction
-   - Used in: `tokenService.ts` → `getFeeTransaction()`
+   - Used in: `tokensService.ts` → `getFeeTransaction()`
 
-3. **POST /api/token/create**
-   - Creates SPL token after fee verification
-   - Used in: `tokenService.ts` → `createTokenOnBackend()`
+3. **POST /api/tokens/create**
+   - Creates SPL tokens after fee verification
+   - Used in: `tokensService.ts` → `createtokensOnBackend()`
 
-## Token Creation Flow
+## tokens Creation Flow
 
 1. **User connects wallet** → `connectPhantomWallet()`
-2. **User fills form** → Token info, supply, details
-3. **User clicks "Create Token"** → `handleCreateToken()`
+2. **User fills form** → tokens info, supply, details
+3. **User clicks "Create tokens"** → `handleCreatetokens()`
 4. **Get fee transaction** → `getFeeTransaction()`
 5. **Sign fee transaction** → `signAndSendFeeTransaction()`
-6. **Create token on backend** → `createTokenOnBackend()`
-7. **Sign token transaction** → `signAndSendTokenTransaction()`
-8. **Token created!** → Success message with mint address
+6. **Create tokens on backend** → `createtokensOnBackend()`
+7. **Sign tokens transaction** → `signAndSendtokensTransaction()`
+8. **tokens created!** → Success message with mint address
 
 ## Required Dependencies
 
 Make sure to install these packages:
 
 ```bash
-npm install @solana/web3.js @solana/spl-token
+npm install @solana/web3.js @solana/spl-tokens
 ```
 
 ## Environment Variables
@@ -107,19 +107,19 @@ Errors are displayed in a user-friendly format with dismissible alerts.
 The UI shows loading indicators during:
 - Wallet connection
 - Fee transaction processing
-- Token creation
+- tokens creation
 - Transaction signing
 
 ## Next Steps
 
-1. **Install dependencies**: Run `npm install @solana/web3.js @solana/spl-token`
+1. **Install dependencies**: Run `npm install @solana/web3.js @solana/spl-tokens`
 2. **Start backend**: Make sure backend is running on port 3000
 3. **Configure environment**: Set up `.env` file
-4. **Test**: Connect wallet and create a test token
+4. **Test**: Connect wallet and create a test tokens
 
 ## Notes
 
 - All transactions require user approval in Phantom wallet
-- Fee transaction must be completed before token creation
+- Fee transaction must be completed before tokens creation
 - Mint keypair is generated on the frontend (secret key stays in browser)
-- Token appears in Phantom wallet automatically after creation
+- tokens appears in Phantom wallet automatically after creation

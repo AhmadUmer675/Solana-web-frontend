@@ -103,7 +103,7 @@ if (isMobileDevice() && !isPhantomInstalled()) {
 - Displays connection status
 - Provides install links when needed
 
-### CreateToken Page
+### Createtokens Page
 - Mobile-aware connection prompts
 - Different messages for desktop vs mobile
 - Automatic app redirect on mobile
