@@ -421,7 +421,7 @@ const Createtokens = () => {
         { label: 'Creating tokens', status: 'pending' },
       ]);
       const createResult = await createtokensOnBackend(walletAddress, {
-        tokensName: formData.tokensName.trim(),
+        tokenName: formData.tokensName.trim(),
         symbol: formData.tokensSymbol.trim().toUpperCase(),
         supply: formData.totalSupply,
         decimals: formData.tokensDecimals,

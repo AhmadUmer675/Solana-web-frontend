@@ -2,7 +2,7 @@
  * API Configuration
  * Base URL for backend API
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://44.204.116.127/api';
 
 export interface ApiResponse<T = any> {
   success: boolean;
