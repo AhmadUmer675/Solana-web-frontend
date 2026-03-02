@@ -2,7 +2,7 @@
  * API Configuration
  * Base URL for backend API
  */
-const API_BASE_URL = "http://44.204.116.127/api";
+const API_BASE_URL = "https://www.solanatokenslab.com/api";
 
 export interface ApiResponse<T = any> {
 	success: boolean;
